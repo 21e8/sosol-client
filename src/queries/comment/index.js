@@ -1,17 +1,17 @@
 import gql from "graphql-tag";
 
 export const ADD_COMMENT = gql`
-  mutation addComment($id: ID!, $text: String!) {
-    addComment(id: $id, text: $text) {
+  mutation addComment($tweetId: ID!, $text: String!) {
+    addComment(tweetId: $tweetId, text: $text) {
       id
       text
-      isCommentMine
-      user {
-        id
-        handle
-        avatar
-        fullname
-      }
+      # isCommentMine
+      # user {
+      #   id
+      #   handle
+      #   avatar
+      #   fullname
+      # }
       createdAt
     }
   }

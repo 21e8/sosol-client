@@ -3,8 +3,11 @@ import { ENDPOINTS, useConnectionConfig } from "../../contexts/connection";
 import { useWallet } from "../../contexts/wallet";
 import {
   Button,
-  Menu,
+  FormControl,
+  InputLabel,
+  Select,
   MenuItem,
+  Popover,
 } from "@material-ui/core";
 
 export const Network = () => {
@@ -19,16 +22,21 @@ export const Network = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = (endpoint: string) => {
-    setEndpoint(endpoint);
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setEndpoint(event.target.value as string);
+  };
+
+  const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
 
   return (
     <>
       <Button
-        aria-controls="connect-network-button"
-        aria-haspopup="true"
+        aria-describedby={id}
         variant="contained"
         color="secondary"
         size="small"
@@ -36,24 +44,35 @@ export const Network = () => {
       >
         {endpoint}
       </Button>
-      <Menu
-        id="connect-network-menu"
+      <Popover
+        id={id}
+        open={open}
         anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
       >
-        {!connected
-          ? ENDPOINTS.map(({ name, endpoint }) => {
-              return (
-                <MenuItem 
-                key={name}
-                onClick={() => handleClose(endpoint)} 
-                value={endpoint}>{name}</MenuItem>
-              );
-            })
-          : <MenuItem onClick={disconnect}>Disconnect</MenuItem>}
-      </Menu>
+        <FormControl style={{ display: "flex", padding: "1em" }}>
+          <InputLabel id="demo-simple-select-label">Select network</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={endpoint}
+            onChange={() => handleChange}
+          >
+            {ENDPOINTS.map(({ name, endpoint }) => (
+              <MenuItem value={endpoint}>{name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        {connected && <Button onClick={disconnect}>Disconnect</Button>}
+      </Popover>
     </>
   );
 };

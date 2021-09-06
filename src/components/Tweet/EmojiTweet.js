@@ -1,16 +1,17 @@
 import React, { useState, useContext } from "react";
+import _ from "lodash";
 import styled from "styled-components";
+import { a, API } from "aws-amplify";
 import { Emoji, Picker } from "emoji-mart";
+import { Loader } from "../Loader";
 import { SmilePlusIcon } from "../Icons";
-import { TOGGLE_REACTION } from "../../queries/tweet";
 import { ThemeContext } from "styled-components";
+import { createReaction } from "../../graphql/mutations";
 import { displayError } from "../../utils";
 import { toast } from "react-toastify";
-import { useMutation } from '@apollo/client';
-import { FEED } from "../../queries/others";
-import { Loader } from '../Loader';
 
 import "emoji-mart/css/emoji-mart.css";
+import { LocalDrinkSharp } from "@material-ui/icons";
 
 const Wrapper = styled.div`
   .emoji-mart {
@@ -64,15 +65,18 @@ export const EmojiTweet = ({ tweetId, reactions }) => {
   const [picker, togglePicker] = useState(false);
   const [emoji, setEmoji] = useState({});
 
-  const [toggleReactionMutation, { loading }] = useMutation(TOGGLE_REACTION, {
-    variables: { id: tweetId, emojiId: emoji?.emojiId, skin: emoji?.skin },
-    refetchQueries: [{ query: FEED }],
-  });
-
   const handleReaction = async ({ emojiId, skin }) => {
     try {
-      await setEmoji({ emojiId, skin });
-      await toggleReactionMutation();
+      setEmoji({ emojiId, skin });
+      const emojiDetails = {
+        tweetId,
+        emojiId: emoji?.emojiId,
+        skin: emoji?.skin,
+      };
+      await API.graphql({
+        query: createReaction,
+        variables: { input: emojiDetails },
+      });
       toast.success("Reaction updated");
     } catch (err) {
       return displayError(err);
@@ -80,10 +84,15 @@ export const EmojiTweet = ({ tweetId, reactions }) => {
   };
 
   const ReactionList = ({ reactions }) => {
-    return reactions
-      .filter((i) => i.count === 1 || (i.count > 1 && i.isMine))
-      .sort((a, b) => a.emojiId.localeCompare(b.emojiId))
-      .map(({ id, emojiId, skin, count, isMine }) => {
+    const r = _.chain(reactions)
+      .map((R, i, arr) => {
+        // TODO: set isMine from userID
+        // Set the count of emojis
+        R.count = arr.filter((r) => r.emojiId === R.emojiId).length;
+        return R;
+      })
+      .uniqBy("emojiId")
+      .map(({ id, emojiId, skin, count, isMine = false }) => {
         return (
           <span
             className={`emoji-count ${isMine ? "mine" : ""}`}
@@ -94,10 +103,31 @@ export const EmojiTweet = ({ tweetId, reactions }) => {
             <span className="emoji-number">{count > 0 && count}</span>
           </span>
         );
-      });
+      })
+      .sortBy(['emojiId'])
+      .value();
+    // const r = reactions.map((R, i, arr) => {
+    //     R.count = arr.filter(r => r.emojiId === R.emojiId).length;
+    //     return R;
+    //   })
+    //   // .filter((i) => i.count === 1 || (i.count > 1 && i.isMine))
+    //   // .sort((a, b) => a.emojiId.localeCompare(b.emojiId))
+    //   .map(({ id, emojiId, skin, count, isMine }) => {
+    //     return (
+    //       <span
+    //         className={`emoji-count ${isMine ? "mine" : ""}`}
+    //         onClick={() => handleReaction({ emojiId, skin })}
+    //         key={id}
+    //       >
+    //         <Emoji emoji={{ id: emojiId, skin }} size={16} />
+    //         <span className="emoji-number">{count > 0 && count}</span>
+    //       </span>
+    //     );
+    //   });
+    return r;
   };
 
-  if (loading) return <Loader />;
+  // if (loading) return <Loader />;
 
   return (
     <Wrapper>

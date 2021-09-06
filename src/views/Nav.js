@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { useQuery } from "@apollo/client";
+// import { useQuery } from "@apollo/client";
 import { Link, NavLink } from "react-router-dom";
 import { MorePopUp } from "../components/MorePopup";
 import { PROFILE } from "../queries/profile";
@@ -106,9 +106,9 @@ const Wrapper = styled.nav`
 
 export const Nav = () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  const { data } = useQuery(PROFILE, {
-    variables: { handle: user?.handle },
-  });
+  // const { data } = useQuery(PROFILE, {
+  //   variables: { handle: user?.handle },
+  // });
 
   return (
     <Wrapper>
@@ -131,9 +131,9 @@ export const Nav = () => {
         <li>
           <NavLink activeClassName="selected " to="/notifications">
             <NotificationsIcon /> <span>Notifications</span>
-            {data?.profile?.newMentionsCount !== 0 && (
+            {/* {data?.profile?.newMentionsCount !== 0 && (
               <span className="badge">{data?.profile?.newMentionsCount}</span>
-            )}
+            )} */}
           </NavLink>
         </li>
         <li>

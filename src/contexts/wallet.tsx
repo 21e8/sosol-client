@@ -14,7 +14,7 @@ import { Transaction } from "@solana/web3.js";
 import { toast } from "react-toastify";
 import { useConnectionConfig } from "./connection";
 import { useLocalStorageState } from "../utils/utils";
-import { useMutation } from "@apollo/client";
+// import { useMutation } from "@apollo/client";
 import { PUBLIC_ADDRESS, LOGIN_REGISTER } from "../queries/auth";
 import base58 from "bs58";
 
@@ -85,15 +85,15 @@ export function WalletProvider({ children = null as any }) {
   const [autoConnect, setAutoConnect] = useState(false);
   const [providerUrl, setProviderUrl] = useLocalStorageState("walletProvider");
 
-  const [getNonce] = useMutation(PUBLIC_ADDRESS);
-  const [setLogin] = useMutation(LOGIN_REGISTER, {
-    onCompleted({ loginRegister }) {
-      if (localStorage) {
-        localStorage.setItem("token", loginRegister.token);
-        localStorage.setItem("user", JSON.stringify(loginRegister.user));
-      }
-    },
-  });
+  // const [getNonce] = useMutation(PUBLIC_ADDRESS);
+  // const [setLogin] = useMutation(LOGIN_REGISTER, {
+  //   onCompleted({ loginRegister }) {
+  //     if (localStorage) {
+  //       localStorage.setItem("token", loginRegister.token);
+  //       localStorage.setItem("user", JSON.stringify(loginRegister.user));
+  //     }
+  //   },
+  // });
 
   const provider = useMemo(
     () => WALLET_PROVIDERS.find(({ url }) => url === providerUrl),
@@ -130,34 +130,33 @@ export function WalletProvider({ children = null as any }) {
                 )}`
               : walletPublicKey;
 
-          try {
-            const {
-              data: { address },
-            } = await getNonce({
-              variables: { publicAddress: walletPublicKey },
-            });
-            if (address.hasPublicAddress) {
-              const data = new TextEncoder().encode(address.user.nonce);
-              const signed = await wallet.sign(data, "utf8");              
-              await setLogin({
-                variables: {
-                  publicAddress: walletPublicKey,
-                  signature: base58.encode(signed.signature),
-                },
-              });
-              toast.success(
-                `Wallet ${keyToDisplay} connected to account. Happy posting.`
-              );
-            } else {
-              await setLogin({ variables: { publicAddress: walletPublicKey } });
-              toast.success(`Wallet ${keyToDisplay} created for account.`);
-            }
-            setConnected(true);
-          } catch (error) {
-            console.log('wallet connect error:', error);
-            // toast.error(`Error connecting: ${error?.message}`);
-            wallet.disconnect();
-          }
+          // try {
+          //   const {
+          //     data: { address },
+          //   } = await getNonce({
+          //     variables: { publicAddress: walletPublicKey },
+          //   });
+          //   if (address.hasPublicAddress) {
+          //     const data = new TextEncoder().encode(address.user.nonce);
+          //     const signed = await wallet.sign(data, "utf8");
+          //     await setLogin({
+          //       variables: {
+          //         publicAddress: walletPublicKey,
+          //         signature: base58.encode(signed.signature),
+          //       },
+          //     });
+          //     toast.success(
+          //       `Wallet ${keyToDisplay} connected to account. Happy posting.`
+          //     );
+          //   } else {
+          //     await setLogin({ variables: { publicAddress: walletPublicKey } });
+          //     toast.success(`Wallet ${keyToDisplay} created for account.`);
+          //   }
+          //   setConnected(true);
+          // } catch (error) {
+          //   toast.error(`Error connecting: ${error?.message}`);
+          //   wallet.disconnect();
+          // }
         }
       });
 
@@ -177,7 +176,7 @@ export function WalletProvider({ children = null as any }) {
         wallet.disconnect();
       }
     };
-  }, [wallet, getNonce, setLogin]);
+  }, [wallet, /* getNonce, setLogin */]);
 
   useEffect(() => {
     if (wallet && autoConnect) {

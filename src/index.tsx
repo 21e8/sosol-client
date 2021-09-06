@@ -2,18 +2,18 @@ import "./index.css";
 // import * as serviceWorker from "./serviceWorker";
 import { App } from "./App";
 import React from "react";
-import { client } from "./apollo/client";
-import { ApolloProvider } from '@apollo/client';
 import { ThemeProvider } from "./contexts/theme";
 import { render } from "react-dom";
 
+import Amplify from "aws-amplify";
+import awsExports from "./aws-exports";
+Amplify.configure(awsExports);
+
 const RootApp = () => (
   <React.StrictMode>
-    <ApolloProvider client={client}>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
-    </ApolloProvider>
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </React.StrictMode>
 );
 

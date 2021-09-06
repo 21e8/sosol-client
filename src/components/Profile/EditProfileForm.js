@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { withRouter } from "react-router-dom";
-import { useMutation } from "@apollo/client";
+// import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import useInput from "../../hooks/useInput";
 import Input from "../Input";
@@ -29,9 +29,9 @@ const EditProfileForm = ({ profile, history }) => {
 
   const handle = profile && profile.handle;
 
-  const [editProfileMutation, { loading }] = useMutation(EDIT_PROFILE, {
-    refetchQueries: [{ query: PROFILE, variables: { handle } }],
-  });
+  // const [editProfileMutation, { loading }] = useMutation(EDIT_PROFILE, {
+  //   refetchQueries: [{ query: PROFILE, variables: { handle } }],
+  // });
 
   const handleEditProfile = async (e) => {
     e.preventDefault();
@@ -41,18 +41,18 @@ const EditProfileForm = ({ profile, history }) => {
     }
 
     try {
-      await editProfileMutation({
-        variables: {
-          firstname: firstname.value,
-          lastname: lastname.value,
-          dob: dob.value,
-          bio: bio.value,
-          location: location.value,
-          website: website.value,
-          avatar: avatarState ? avatarState : avatar.value,
-          coverPhoto: coverPhotoState ? coverPhotoState : coverPhoto.value,
-        },
-      });
+      // await editProfileMutation({
+      //   variables: {
+      //     firstname: firstname.value,
+      //     lastname: lastname.value,
+      //     dob: dob.value,
+      //     bio: bio.value,
+      //     location: location.value,
+      //     website: website.value,
+      //     avatar: avatarState ? avatarState : avatar.value,
+      //     coverPhoto: coverPhotoState ? coverPhotoState : coverPhoto.value,
+      //   },
+      // });
 
       toast.success("Your profile has been updated 🥳");
     } catch (err) {
@@ -151,9 +151,9 @@ const EditProfileForm = ({ profile, history }) => {
         value={location.value}
         onChange={location.onChange}
       />
-      <Button outline disabled={loading} type="submit">
+      {/* <Button outline disabled={loading} type="submit">
         {loading ? "Saving" : "Save"}
-      </Button>
+      </Button> */}
     </Form>
   );
 };

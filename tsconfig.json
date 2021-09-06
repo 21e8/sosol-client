@@ -10,15 +10,8 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
-    "typeRoots": [
-      "node_modules/@types",
-      "types"
-    ],
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "typeRoots": ["node_modules/@types", "types"],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "noFallthroughCasesInSwitch": true,
@@ -27,11 +20,27 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": [
-    "src",
-    "types"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src", "types"],
+  "exclude": ["node_modules"],
+  "jsRules": {
+    "object-literal-sort-keys": false
+  },
+  "rules": {
+    "member-access": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "interface-name": false,
+    "no-submodule-imports": false,
+    "no-implicit-dependencies": false,
+    "no-empty": false,
+    "jsx-no-lambda": false,
+    "no-console": false
+  },
+  "linterOptions": {
+    "exclude": [
+      "config/**/*.js",
+      "node_modules/**/*.ts",
+      "coverage/lcov-report/*.js"
+    ]
+  }
 }

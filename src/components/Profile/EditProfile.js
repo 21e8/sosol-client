@@ -1,9 +1,9 @@
 import React from "react";
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
 import styled from "styled-components";
 import { Loader } from "../Loader";
 import EditProfileForm from "./EditProfileForm";
-import { USER } from "../../queries/client";
+import { USER } from "../../queries/user";
 import { PROFILE } from "../../queries/profile";
 
 const Wrapper = styled.div`
@@ -55,19 +55,19 @@ const Wrapper = styled.div`
 `;
 
 const EditProfile = () => {
-	const {
-		data: { user }
-	} = useQuery(USER);
-	const { loading, error, data } = useQuery(PROFILE, {
-		variables: { handle: user.handle }
-	});
+	// const {
+	// 	data: { user }
+	// } = useQuery(USER);
+	// const { loading, error, data } = useQuery(PROFILE, {
+	// 	variables: { handle: user.handle }
+	// });
 
 	if (loading) return <Loader />;
 
 	return (
 		<Wrapper>
 			<div className="flex-wrapper">
-				<EditProfileForm profile={data && data.profile} />
+				{/* <EditProfileForm profile={data && data.profile} /> */}
 			</div>
 		</Wrapper>
 	);

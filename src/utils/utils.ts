@@ -3,11 +3,9 @@ import { MintInfo } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { TokenAccount } from "../models";
 import { TokenInfo } from "@solana/spl-token-registry";
-// import { WAD } from "../package/constants";
+import { WAD } from "../package/constants";
 import { ZERO } from '../constants/math'
 import { useCallback, useState } from "react";
-
-const WAD = new BigNumber("1e+18");
 
 export type KnownTokenMap = Map<string, TokenInfo>;
 

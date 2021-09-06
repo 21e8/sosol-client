@@ -1,17 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
-import PersonIcon from '@material-ui/icons/Person';
 import Linkify from "linkifyjs/react";
-import { EmojiTweet, DeleteTweet, Retweet } from "./index";
+import PersonIcon from '@material-ui/icons/Person';
 import TweetFile from "../../styles/TweetFile";
-// eslint-disable-next-line
 import hashtag from "linkifyjs/plugins/hashtag";
-// eslint-disable-next-line
 import mention from "linkifyjs/plugins/mention";
 import moment from "moment";
 import styled from "styled-components";
+import { API, graphqlOperation } from "aws-amplify";
 import { CommentIcon } from "../Icons";
+import { EmojiTweet, DeleteTweet, Retweet } from "./index";
 import { Link } from "react-router-dom";
+import { onCreateReaction, onCreateComment } from "../../graphql/subscriptions";
 import { setDate } from "../../utils";
 
 const Wrapper = styled.div`
@@ -100,21 +100,26 @@ const Wrapper = styled.div`
 `;
 
 export const Tweet = ({ tweet }) => {
-  const {
-    id,
-    text,
-    // tags,
-    user,
-    files,
-    isTweetMine,
-    isRetweet,
-    retweetsCount,
-    reactions,
-    commentsCount,
-    createdAt,
-  } = tweet;
+  // const handle = user && user.handle;
+  const handle = null;
+  const [reactions, setReactions] = useState(tweet.reactions?.items);
+  const [comments, setComments] = useState(tweet.comments?.items);
 
-  const handle = user && user.handle;
+  useEffect(() => {
+    (async () => await API.graphql(graphqlOperation(onCreateReaction)).subscribe({
+      next: (reactionData) => {
+        const reaction = reactionData.value.data.onCreateReaction;
+        setReactions([reaction, ...reactions]);
+      },
+    }))();
+    (async () => await API.graphql(graphqlOperation(onCreateComment)).subscribe({
+      next: (commentData) => {
+        const comment = commentData.value.data.onCreateComment;
+        setComments([comment, ...comments]);
+      },
+    }))();
+  }, [reactions, comments]);
+
   const linkifyOptions = {
     formatHref: function (value, type) {
       if (type === "hashtag") {
@@ -127,7 +132,7 @@ export const Tweet = ({ tweet }) => {
 
   return (
     <Wrapper>
-      <Link to={`/${handle}`}>
+      <Link /* to={`/${handle}`} */>
         {/* {user && user.avatar ? <Avatar size="large" src={user.avatar} /> : <Avatar size="large" icon={<UserOutlined />} />} */}
         <Avatar className="avatar">
           <PersonIcon />
@@ -136,50 +141,50 @@ export const Tweet = ({ tweet }) => {
 
       <div className="tweet-info">
         <div className="tweet-info-user">
-          <Link to={`/${handle}`}>
+          {/* <Link to={`/${handle}`}>
             <span className="username">{user && user.fullname}</span>
             <span className="secondary">{`@${handle}`}</span>
-          </Link>
+          </Link>*/}
           &nbsp;&nbsp;
-          <Link to={`/${handle}/status/${id}`} className="secondary">
-            {moment(setDate(createdAt)).fromNow()}
-          </Link>
+          <Link to={`/${handle}/status/${tweet.id}`} className="secondary">
+            {moment(setDate(tweet.createdAt)).fromNow()}
+          </Link> 
         </div>
 
         <Linkify options={linkifyOptions}>
-          <p>{text}</p>
+          <p>{tweet.text}</p>
         </Linkify>
 
-        <Link to={`/${handle}/status/${id}`}>
+        {/* <Link to={`/${handle}/status/${id}`}>
           {files && files.length && files[0] ? (
             <TweetFile src={files[0].url} alt="tweet-file" />
           ) : null}
-        </Link>
+        </Link> */}
 
         <div className="tweet-stats">
           <span>
-            <EmojiTweet tweetId={id} reactions={reactions} />
+            <EmojiTweet tweetId={tweet.id} reactions={reactions} />
           </span>
 
           <div>
             <span className="comment">
-              <Link to={`/${handle}/status/${id}`}>
+              <Link to={`/${handle}/status/${tweet.id}`}>
                 <CommentIcon />
-                {commentsCount ? commentsCount : null}
+                {comments?.length ? comments?.length : null}
               </Link>
             </span>
           </div>
 
           <div>
-            <Retweet
+            {/* <Retweet
               id={id}
               isRetweet={isRetweet}
               retweetsCount={retweetsCount}
-            />
+            /> */}
           </div>
 
           <div>
-            <span>{isTweetMine ? <DeleteTweet id={id} /> : null}</span>
+            {/* <span>{isTweetMine ? <DeleteTweet id={id} /> : null}</span> */}
           </div>
         </div>
       </div>

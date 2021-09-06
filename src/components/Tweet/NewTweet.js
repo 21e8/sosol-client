@@ -8,13 +8,14 @@ import styled from "styled-components";
 import useInput from "../../hooks/useInput";
 import { FEED } from "../../queries/others";
 import { NEW_TWEET } from "../../queries/tweet";
-import { SIGN_FILE } from "../../queries/files";
-import { USER } from "../../queries/client";
+import { USER } from "../../queries/user";
 import { UploadFileIcon } from "../Icons";
 import { displayError } from "../../utils";
 import { uploadImage } from "../../utils";
-import { useQuery, useMutation } from "@apollo/client";
+// import { useQuery, useMutation } from "@apollo/client";
 import { useSnackbar } from "notistack";
+import { API, graphqlOperation } from "aws-amplify";
+import { createTweet } from "../../graphql/mutations";
 
 const Wrapper = styled.div`
   display: flex;
@@ -62,11 +63,6 @@ export const NewTweet = () => {
   const [tweetFiles, setTweetFiles] = useState([]);
   const tweet = useInput("");
 
-  const [newTweetMutation, { loading }] = useMutation(NEW_TWEET, {
-    refetchQueries: [{ query: FEED }],
-  });
-  const [signFileMutation] = useMutation(SIGN_FILE);
-
   const handleNewTweet = async (e) => {
     e.preventDefault();
 
@@ -79,14 +75,17 @@ export const NewTweet = () => {
       .filter((str) => str.startsWith("@"));
 
     try {
-      await newTweetMutation({
-        variables: {
-          text: tweet.value,
-          tags,
-          mentions,
-          files: tweetFiles,
-        },
-      });
+      await API.graphql(
+        graphqlOperation(createTweet, {
+          input: {
+            text: tweet.value,
+            type: "Post",
+            tags,
+            mentions,
+            // files: tweetFiles,
+          },
+        })
+      );
 
       enqueueSnackbar("Your tweet has been posted", { variant: "success" });
     } catch (err) {
@@ -98,24 +97,11 @@ export const NewTweet = () => {
   };
 
   const handleTweetFiles = async (e) => {
-    try {
-      const file = e.target.files[0];
-      const { data } = await signFileMutation({
-        variables: {
-          file: file.name,
-          type: file.type,
-        },
-      });
-      const signedUrl = data.signFileUrl;
-      const imageUrl = await uploadImage(file, signedUrl);
-      console.log(imageUrl);
-      setTweetFiles([...tweetFiles, imageUrl]);
-    } catch (error) {
-      console.log(error);
-    }
+    const imageUrl = await uploadImage(e.target.files[0]);
+    setTweetFiles([...tweetFiles, imageUrl]);
   };
 
-  const { data } = useQuery(USER);
+  // const { data } = useQuery(USER);
 
   return (
     <Wrapper>
@@ -152,9 +138,7 @@ export const NewTweet = () => {
                 onChange={handleTweetFiles}
               />
             </div>
-            <Button sm disabled={loading}>
-              Post
-            </Button>
+            <Button sm /* disabled={ loading }*/>Post</Button>
           </div>
         </div>
       </form>

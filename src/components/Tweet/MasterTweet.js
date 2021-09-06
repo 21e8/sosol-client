@@ -1,14 +1,16 @@
-import React from "react";
-import { useParams } from "react-router-dom";
-import { useQuery } from '@apollo/client';
-import styled from "styled-components";
-import { TWEET } from "../../queries/tweet";
-import { Loader } from "../Loader";
-import { Tweet } from "./Tweet";
-import Comment from "../Comment/Comment";
+import React, { useEffect, useState } from "react";
 import AddComment from "../Comment/AddComment";
-import { sortFn } from "../../utils";
+import Comment from "../Comment/Comment";
 import CustomResponse from "../CustomResponse";
+import styled from "styled-components";
+import { API, graphqlOperation } from "aws-amplify";
+import { Loader } from "../Loader";
+import { TWEET } from "../../queries/tweet";
+import { Tweet } from "./Tweet";
+import { getTweet } from '../../graphql/queries';
+import { onCreateComment } from "../../graphql/subscriptions";
+import { sortFn } from "../../utils";
+import { useParams } from "react-router-dom";
 
 const Wrapper = styled.div`
   margin-bottom: 7rem;
@@ -16,34 +18,53 @@ const Wrapper = styled.div`
 
 export const MasterTweet = () => {
   const { tweetId } = useParams();
+  const [tweet, setTweet] = useState();
+  const [comments, setComments] = useState([]);
 
-  const { loading, error, data } = useQuery(TWEET, { variables: { id: tweetId } });
+  const fetchTweet = async () => {
+    try {
+      const tweetData = await API.graphql(graphqlOperation(getTweet, { id: tweetId }));
+      const tweet = tweetData.data.getTweet;
+      setTweet(tweet);
+      const sortComments = tweet.comments?.items?.length ? tweet.comments?.items?.sort(sortFn) : [];
+      setComments(sortComments);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  const comments =
-    data && data.tweet && data.tweet.comments && data.tweet.comments.length
-      ? data.tweet.comments
-      : [];
-  comments.sort(sortFn);
+  useEffect(() => {
+    (async () => await API.graphql(graphqlOperation(onCreateComment)).subscribe({
+      next: (commentData) => {
+        const comment = commentData.value.data.onCreateComment;
+        setComments([comment, ...comments]);
+      },
+    }))();
+  }, [comments]);
+
+  useEffect(() => {
+    fetchTweet();
+  }, []);
 
   return (
     <Wrapper>
-      {loading ? (
+      {/* {loading ? (
         <Loader />
-      ) : (
+      ) : (*/}
         <>
-          {data && data.tweet && data.tweet.id ? (
-            <Tweet tweet={data && data.tweet} />
+          {tweet && tweet.id ? (
+            <Tweet tweet={tweet} comments={comments} />
           ) : (
             <CustomResponse text="Oops, the tweet you are looking for doesn't seem to be exist." />
           )}
-          {data && data.tweet && data.tweet.id ? (
-            <AddComment id={data.tweet.id} />
+          {tweet && tweet.id ? (
+            <AddComment id={tweet.id} />
           ) : null}
-          {comments.map((comment) => (
+          {comments && comments?.length > 0 && comments.map((comment) => (
             <Comment key={comment.id} comment={comment} />
           ))}
         </>
-      )}
+      {/*)} */}
     </Wrapper>
   );
 };

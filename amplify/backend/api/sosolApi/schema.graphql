@@ -1,0 +1,88 @@
+type User @model {
+  id: ID!
+  firstname: String
+  lastname: String
+  handle: String!
+  walletId: String!
+  coverPhoto: String
+  avatar: String
+  bio: String
+  location: String
+  website: String
+  dob: String
+  # tweets: [Tweet]
+
+  # retweets: [Retweet]
+  # following: [User]
+  # followers: [User]
+  # comments: [Comment]
+  # reactions: [Reaction]
+  # files: [File]
+  # # computed fields
+  # fullname: String
+  # isSelf: Boolean
+  # isFollowing: Boolean
+  # followingCount: Int
+  # followersCount: Int
+  # newMentionsCount: Int
+  # tweetsCount: Int
+}
+
+type Tweet @model
+  @key(name: "TweetFeed", fields: ["type", "createdAt"], queryField: "TweetFeed") {
+  id: ID!
+  # user: User
+  text: String!
+  tags: [String]
+  # files: [File]
+  mentions: [String]
+  comments: [Comment] @connection(keyName: "byTweet", fields: ["id"])
+  reactions: [Reaction] @connection(keyName: "byReaction", fields: ["id"])
+  # retweets: [Retweet]
+  type: String!
+  createdAt: String!
+  # # computer fields
+  # commentsCount: Int!
+  # retweetsCount: Int!
+  # isTweetMine: Boolean!
+  # isRetweet: Boolean!
+}
+
+type Comment @model
+  @key(name: "byTweet", fields: ["tweetId", "text"]) {
+  id: ID!
+  text: String!
+  # user: User
+  tweetId: ID!
+  # computed fields
+  # isCommentMine: Boolean
+}
+
+type Reaction @model
+  @key(name: "byReaction", fields: ["tweetId"])  {
+  id: ID!
+  emojiId: String!
+  skin: Int
+  # isMine: Boolean
+  # count: Int
+  tweetId: ID!
+  # user: User
+}
+
+type File @model {
+  id: ID!
+  url: String!
+  tweet: Tweet
+  user: User
+}
+
+type Retweet @model {
+  id: ID!
+  tweet: Tweet
+  user: User
+}
+
+type AuthPayload @model {
+  token: String!
+  user: User!
+}

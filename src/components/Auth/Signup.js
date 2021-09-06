@@ -1,5 +1,5 @@
 import React from "react";
-import { useMutation } from '@apollo/client';
+// import { useMutation } from '@apollo/client';
 import { toast } from "react-toastify";
 import useInput from "../../hooks/useInput";
 import Input from ".././Input";
@@ -15,18 +15,18 @@ export default ({ changeToLogin }) => {
   const email = useInput("");
   const password = useInput("");
 
-  const [signupMutation, { loading }] = useMutation(SIGNUP, {
-    update: (cache, { data: { signup } }) => {
-      localStorage.setItem("token", signup.token);
-      localStorage.setItem("user", JSON.stringify(signup.user));
-      cache.writeData({
-        data: {
-          isLoggedIn: true,
-          user: JSON.parse(localStorage.getItem("user")),
-        },
-      });
-    },
-  });
+  // const [signupMutation, { loading }] = useMutation(SIGNUP, {
+  //   update: (cache, { data: { signup } }) => {
+  //     localStorage.setItem("token", signup.token);
+  //     localStorage.setItem("user", JSON.stringify(signup.user));
+  //     cache.writeData({
+  //       data: {
+  //         isLoggedIn: true,
+  //         user: JSON.parse(localStorage.getItem("user")),
+  //       },
+  //     });
+  //   },
+  // });
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -59,15 +59,15 @@ export default ({ changeToLogin }) => {
     }
 
     try {
-      await signupMutation({
-        variables: {
-          firstname: firstname.value,
-          lastname: lastname.value,
-          handle: handle.value,
-          email: email.value,
-          password: password.value,
-        },
-      });
+      // await signupMutation({
+      //   variables: {
+      //     firstname: firstname.value,
+      //     lastname: lastname.value,
+      //     handle: handle.value,
+      //     email: email.value,
+      //     password: password.value,
+      //   },
+      // });
 
       toast.success("You are logged in");
     } catch (err) {

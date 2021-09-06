@@ -2,7 +2,8 @@ import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { AccountsProvider } from "./contexts/accounts";
 import { ConnectionProvider } from "./contexts/connection";
-import { Home, Suggestion, Nav } from "./views";
+import { Home, Suggestion, Nav, Explore } from "./views";
+import { MasterTweet } from './components/Tweet/MasterTweet'
 import { MarketProvider } from "./contexts/market";
 import { WalletProvider } from "./contexts/wallet";
 import { makeStyles, Container, Grid } from "@material-ui/core";
@@ -45,6 +46,12 @@ export function Routes() {
                       <Grid direction="row" xs={7}>
                         <Switch>
                           <Route exact path="/" component={Home} />
+                          <Route
+                            exact
+                            path={`/:handle/status/:tweetId`}
+                            component={MasterTweet}
+                          />
+                          <Route path="/explore" component={Explore} />
                         </Switch>
                       </Grid>
                       <Grid direction="row" xs={3}>

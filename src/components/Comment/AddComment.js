@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { toast } from "react-toastify";
 import TextareaAutosize from "react-textarea-autosize";
-import { useQuery, useMutation } from "@apollo/client";
+// import { useQuery, useMutation } from "@apollo/client";
 import useInput from "../../hooks/useInput";
 import Button from "../../styles/Button";
 import { displayError } from "../../utils";
@@ -10,7 +10,9 @@ import Avatar from "@material-ui/core/Avatar";
 import PersonIcon from "@material-ui/icons/Person";
 import { TWEET } from "../../queries/tweet";
 import { ADD_COMMENT } from "../../queries/comment";
-import { USER } from "../../queries/client";
+import { USER } from "../../queries/user";
+import { createComment } from '../../graphql/mutations';
+import { API } from "aws-amplify";
 
 const Wrapper = styled.div`
 	display: flex;
@@ -47,39 +49,17 @@ const Wrapper = styled.div`
 const AddComment = ({ id }) => {
   const comment = useInput("");
 
-  const [addCommentMutation, { loading }] = useMutation(ADD_COMMENT, {
-    update: (cache, payload) => {
-      const { tweet } = cache.readQuery({
-        query: TWEET,
-        variables: {
-          id,
-        },
-      });
-
-      let comments = tweet.comments;
-      comments = [...comments, payload.data.addComment];
-
-      cache.writeQuery({
-        query: TWEET,
-        data: {
-          tweet: { ...tweet, commentsCount: tweet.commentsCount + 1, comments },
-        },
-      });
-    },
-  });
-
   const handleAddComment = async (e) => {
     e.preventDefault();
 
     if (!comment.value) return toast("Reply something");
 
     try {
-      await addCommentMutation({
-        variables: {
-          id,
-          text: comment.value,
-        },
-      });
+      const commentDetails = {
+        tweetId: id,
+        text: comment.value,
+      };
+      await API.graphql({ query: createComment, variables: { input: commentDetails }});
 
       toast.success("Your reply has been added");
     } catch (err) {
@@ -89,9 +69,9 @@ const AddComment = ({ id }) => {
     comment.setValue("");
   };
 
-  const {
-    data: { user },
-  } = useQuery(USER);
+  // const {
+  //   data: { user },
+  // } = useQuery(USER);
 
   return (
     <Wrapper>
@@ -111,7 +91,7 @@ const AddComment = ({ id }) => {
           />
 
           <div className="add-comment-action">
-            <Button sm disabled={loading}>
+            <Button sm /* disabled={loading} */>
               Reply
             </Button>
           </div>

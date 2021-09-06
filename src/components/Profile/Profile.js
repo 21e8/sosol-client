@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuery } from '@apollo/client';
+// import { useQuery } from '@apollo/client';
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import ProfileInfo from "./ProfileInfo";
@@ -26,11 +26,11 @@ const Wrapper = styled.div`
 const Profile = () => {
   const { handle } = useParams();
 
-  const { loading, error, data } = useQuery(PROFILE, {
-    variables: { handle },
-  });
+  // const { loading, error, data } = useQuery(PROFILE, {
+  //   variables: { handle },
+  // });
 
-  if (loading) return <Loader />;
+  // if (loading) return <Loader />;
 
   return (
     <Wrapper>
@@ -44,12 +44,12 @@ const Profile = () => {
           </span>
         </div>
       </Header> */}
-      <ProfileInfo profile={data && data.profile} />
+      {/* <ProfileInfo profile={data && data.profile} />
       {data && data.profile && data.profile.tweets && data.profile.tweets.length
         ? data.profile.tweets.map((tweet) => (
             <Tweet key={tweet.id} tweet={tweet} />
           ))
-        : null}
+        : null} */}
     </Wrapper>
   );
 };

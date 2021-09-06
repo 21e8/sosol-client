@@ -1,8 +1,13 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-import fs from 'fs';
+import moment from "moment";
 
 export const displayError = (err) => {
+  if (err.errors) {
+    console.log(err.errors);
+    err.errors.forEach((err) => toast.error(err.message));
+    return;
+  }
   let e = err.message.split(":");
   e = e.length === 1 ? e[0] : e[1];
   toast.error(e.trim().replace(".", ""));
@@ -15,26 +20,22 @@ export const sortFn = (a, b) => {
 };
 
 export const setDate = (date) => {
+  date = moment.utc(date).valueOf();
   const newDate = new Date(0);
   newDate.setUTCSeconds(date / 1000);
   return newDate;
 };
 
-export const uploadImage = async (file, signedUrl) => {
+export const uploadImage = async (file) => {
   const formData = new FormData();
-  formData.append("image", file);
-  formData.append("name", file.name);
+  formData.append("file", file);
+  formData.append("upload_preset", "sosol-build");
 
   let toastId = null;
-  const data = await axios.request({
-    method: "PUT",
-    url: signedUrl,
+  const { data } = await axios.request({
+    method: "POST",
+    url: process.env.REACT_APP_CLOUDINARY_URL,
     data: formData,
-    headers: {
-      "Content-Type": file.type,
-      "x-amz-acl": "public-read",
-      "Content-Disposition": "inline",
-    },
     onUploadProgress: (p) => {
       const progress = p.loaded / p.total;
 
@@ -53,5 +54,5 @@ export const uploadImage = async (file, signedUrl) => {
 
   toast.dismiss(toastId);
 
-  return data;
+  return data.secure_url;
 };

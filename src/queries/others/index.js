@@ -1,33 +1,43 @@
 import gql from "graphql-tag";
 
 export const FEED = gql`
-  query feed {
-    feed {
-      id
-      text
-      tags
-      isTweetMine
-      commentsCount
-      retweetsCount
-      isRetweet
-      files {
+  query TweetFeed {
+    TweetFeed(type: "Post", sortDirection: DESC) {
+      items {
         id
-        url
+        text
+        tags
+        createdAt
+        # isTweetMine
+        # commentsCount
+        # retweetsCount
+        # isRetweet
+        # files {
+        #   id
+        #   url
+        # }
+        # user {
+        #   id
+        #   avatar
+        #   handle
+        #   fullname
+        # }
+        reactions {
+          items {
+            id
+            emojiId
+            skin
+          }
+        }
+        comments {
+          items {
+            id
+            text
+            tweetId
+            createdAt
+          }
+        }
       }
-      user {
-        id
-        avatar
-        handle
-        fullname
-      }
-      reactions {
-        id
-        emojiId
-        skin
-        isMine
-        count
-      }
-      createdAt
     }
   }
 `;

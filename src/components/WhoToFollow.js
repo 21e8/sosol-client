@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+// import { useQuery } from "@apollo/client";
 import { Loader } from "./Loader";
 import Follow from "./Profile/Follow";
 import { USERS } from "../queries/others";
@@ -84,16 +84,16 @@ export const User = ({ user }) => (
 );
 
 export const WhoToFollow = () => {
-  const { loading, error, data } = useQuery(USERS);
+  // const { loading, error, data } = useQuery(USERS);
 
-  if (loading) return <Loader />;
-  if (error) return <p>Error :(</p>;
+  // if (loading) return <Loader />;
+  // if (error) return <p>Error :(</p>;
 
   return (
     <Wrapper>
-      {data.users.map((user) => (
+      {/* {data.users.map((user) => (
         <User key={user.id} user={user} />
-      ))}
+      ))} */}
     </Wrapper>
   );
 };

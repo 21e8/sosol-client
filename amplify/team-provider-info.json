@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-sosol-dev-94331-authRole",
+      "UnauthRoleArn": "arn:aws:iam::453602292791:role/amplify-sosol-dev-94331-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::453602292791:role/amplify-sosol-dev-94331-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-sosol-dev-94331-deployment",
+      "UnauthRoleName": "amplify-sosol-dev-94331-unauthRole",
+      "StackName": "amplify-sosol-dev-94331",
+      "StackId": "arn:aws:cloudformation:us-west-2:453602292791:stack/amplify-sosol-dev-94331/2c64a090-045b-11ec-acab-0aec151588f9",
+      "AmplifyAppId": "d1oqjlax3ehvwu"
+    }
+  }
+}
